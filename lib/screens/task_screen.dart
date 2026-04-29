@@ -4,6 +4,7 @@ import 'profile_screen.dart';
 import 'package:task_manager/models/tasks.dart';
 import 'package:provider/provider.dart';
 import '../providers/task_provider.dart';
+import 'favorite_task_screen.dart';
 
 class TaskScreen extends StatefulWidget {
   final int userId;
@@ -139,6 +140,15 @@ class _TaskScreenState extends State<TaskScreen> {
       appBar: AppBar(
         title: const Text('My Tasks'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.star),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const FavoriteTasksScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () => Navigator.push(

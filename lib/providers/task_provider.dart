@@ -8,7 +8,7 @@ class TaskProvider extends ChangeNotifier {
   // Whenever a change is made to the tasks, call notifyListeners() to update the UI}
   List<Task> _tasks = [];
   List<Task> get tasks => _tasks;
-  List<Task> get favioriteTasks =>
+  List<Task> get favoriteTasks =>
       _tasks.where((task) => task.isFavorite == 1).toList();
 
   Future<void> loadTasks() async {
