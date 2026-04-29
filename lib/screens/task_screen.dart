@@ -5,6 +5,7 @@ import 'package:task_manager/models/tasks.dart';
 import 'package:provider/provider.dart';
 import '../providers/task_provider.dart';
 import 'favorite_task_screen.dart';
+import 'deadline_screen.dart';
 
 class TaskScreen extends StatefulWidget {
   final int userId;
@@ -22,6 +23,26 @@ class _TaskScreenState extends State<TaskScreen> {
     Future.microtask(() {
       Provider.of<TaskProvider>(context, listen: false).loadTasks();
     });
+  }
+
+  String getRemainingTime(String dueDate) {
+    final now = DateTime.now();
+    final due = DateTime.parse(dueDate);
+
+    final difference = due.difference(now);
+
+    if (difference.isNegative) {
+      return "ExPIRED";
+    }
+
+    final days = difference.inDays;
+    final hours = difference.inHours % 24;
+
+    if (days > 0) {
+      return "$days days left";
+    } else {
+      return "$hours hours left";
+    }
   }
 
   void _openTaskDialog({Task? task}) {
@@ -130,6 +151,16 @@ class _TaskScreenState extends State<TaskScreen> {
     }
   }
 
+  Color getRemainingColor(String remaining) {
+    if (remaining == "EXPIRED") {
+      return Colors.red;
+    } else if (remaining.contains("hours")) {
+      return Colors.orange;
+    } else {
+      return Colors.green;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final tasks = Provider.of<TaskProvider>(context);
@@ -174,12 +205,18 @@ class _TaskScreenState extends State<TaskScreen> {
               itemCount: userTasks.length,
               itemBuilder: (_, i) {
                 final task = userTasks[i];
+                final remaining = getRemainingTime(task.dueDate);
                 return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
+                  margin: const EdgeInsets.all(10),
                   child: ListTile(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => DeadlineScreen(task: task),
+                        ),
+                      );
+                    },
                     leading: Checkbox(
                       value: task.isCompleted == 1,
                       onChanged: (_) => tasks.toggleComplete(task),
@@ -192,7 +229,22 @@ class _TaskScreenState extends State<TaskScreen> {
                             : null,
                       ),
                     ),
-                    subtitle: Text('Due: ${task.dueDate}'),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Today: ${DateTime.now().toString().split(' ')[0]}',
+                        ),
+                        Text('Due: ${task.dueDate}'),
+                        Text(
+                          'Remaining: $remaining',
+                          style: TextStyle(
+                            color: getRemainingColor(remaining),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
