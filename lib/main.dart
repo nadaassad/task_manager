@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
-import 'screens/tasks_screen.dart';
+import 'screens/login_screen.dart';
+import 'package:provider/provider.dart';
+import 'providers/task_provider.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // 👈 هذا السطر هو الحل
-  runApp(const MyApp());
+void main() {
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => TaskProvider())],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -11,6 +17,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: TasksScreen());
+    return MaterialApp(
+      title: 'Student Task Manager',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        useMaterial3: true,
+      ),
+      home: const LoginScreen(),
+    );
   }
 }
